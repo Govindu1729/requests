@@ -218,7 +218,15 @@ class HTTPDigestAuth(AuthBase):
         if p_parsed.query:
             path += f"?{p_parsed.query}"
 
-        A1 = f"{self.username}:{realm}:{self.password}"
+        # Encode username and password to UTF-8 for non-latin character support
+        username = self.username
+        password = self.password
+        if isinstance(username, str):
+            username = username.encode("utf-8")
+        if isinstance(password, str):
+            password = password.encode("utf-8")
+
+        A1 = f"{username.decode('utf-8')}:{realm}:{password.decode('utf-8')}"
         A2 = f"{method}:{path}"
 
         HA1 = hash_utf8(A1)
